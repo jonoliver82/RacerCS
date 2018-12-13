@@ -46,14 +46,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="CarSprite.cs" />
+    <Compile Include="CurveState.cs" />
+    <Compile Include="HeightState.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="RacerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="RacerForm.Designer.cs">
+      <DependentUpon>RacerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenderInformation.cs" />
+    <Compile Include="RoadParameters.cs" />
+    <Compile Include="RoadSegment.cs" />
+    <Compile Include="Sprite.cs" />
+    <Compile Include="SpritesheetLocation.cs" />
+    <Compile Include="SpriteType.cs" />
+    <EmbeddedResource Include="RacerForm.resx">
+      <DependentUpon>RacerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -75,6 +88,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="racer.js" />
+    <Content Include="spritesheet.high.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
