@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CarSprite.cs" />
     <Compile Include="CurveState.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameMode.cs" />
@@ -67,7 +66,7 @@
     <Compile Include="RenderInformation.cs" />
     <Compile Include="RoadParameters.cs" />
     <Compile Include="RoadSegment.cs" />
-    <Compile Include="Sprite.cs" />
+    <Compile Include="SegmentSprite.cs" />
     <Compile Include="SpriteBufferEntry.cs" />
     <EmbeddedResource Include="RacerForm.resx">
       <DependentUpon>RacerForm.cs</DependentUpon>

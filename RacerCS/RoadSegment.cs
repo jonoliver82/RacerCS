@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RacerCS
+﻿namespace RacerCS
 {
     public class RoadSegment
     {
@@ -12,6 +6,6 @@ namespace RacerCS
 
         public double Curve { get; set; }
 
-        public Sprite ZoneSprite { get; set; }
+        public SegmentSprite SegmentSprite { get; set; }
     }
 }

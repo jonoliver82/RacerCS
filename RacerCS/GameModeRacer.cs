@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RacerCS
@@ -18,15 +15,14 @@ namespace RacerCS
         private RoadParameters _roadParams;
         
         private double _lastDelta;
-       
 
         private List<RoadSegment> _road;
 
-        private Rectangle _treeLocation;
-        private Rectangle _rockLocation;
-        private CarSprite _spriteForward;
-        private CarSprite _spriteLeft;
-        private CarSprite _spriteRight;
+        private Rectangle _cactusSpriteLocation;
+        private Rectangle _rockSpriteLocation;
+        private Rectangle _carForwardSpriteLocation;
+        private Rectangle _carLeftSpriteLocation;
+        private Rectangle _carRightSpriteLocation;
 
         public GameModeRacer(Game game) : base(game, "spritesheet.high.png")
         {
@@ -49,29 +45,24 @@ namespace RacerCS
 
         private void Init()
         {           
-            _treeLocation = new Rectangle(321, 9, 23, 50);
-            _rockLocation = new Rectangle(345, 9, 11, 14);
-
-            var carForwardSpriteLocation = new Rectangle(0, 130, 69, 38);
-            _spriteForward = new CarSprite(carForwardSpriteLocation, 125, 190);
-            
-            var carLeftSpriteLocation = new Rectangle(70, 130, 77, 38);
-            _spriteLeft = new CarSprite(carLeftSpriteLocation, 117, 190);
-
-            var carRightSpriteLocation = new Rectangle(148, 130, 77, 38);
-            _spriteRight = new CarSprite(carRightSpriteLocation, 125, 190);
+            _cactusSpriteLocation = new Rectangle(321, 9, 23, 50);
+            _rockSpriteLocation = new Rectangle(345, 9, 11, 14);
+            _carForwardSpriteLocation = new Rectangle(0, 130, 69, 38);
+            _carLeftSpriteLocation = new Rectangle(70, 130, 77, 38);
+            _carRightSpriteLocation = new Rectangle(148, 130, 77, 38);
 
             _player = new Player
             {
                 Position = 10,
                 Speed = 0,
-                Acceleration = 0.05,
+                Acceleration = 0.025,
                 Deceleration = 0.3,
                 Breaking = 0.6,
                 Turning = 5.0,
                 PositionX = 0,
-                MaxSpeed = 15,
-                Sprite = _spriteForward,
+                MaxSpeed = 5,
+                SpriteSource = _carForwardSpriteLocation,
+                SpriteDestination = new Point(125, 190)
             };
 
             GenerateRoad();
@@ -158,14 +149,14 @@ namespace RacerCS
 
                 for (int i = 0; i < _roadParams.ZoneSize; i++)
                 {
-                    Sprite zoneSprite = null;
+                    SegmentSprite segmentSprite = null;
 
                     // Add a tree
                     if (i % _roadParams.ZoneSize / 4 == 0)
                     {
-                        zoneSprite = new Sprite
+                        segmentSprite = new SegmentSprite
                         {
-                            SourceLocation = _rockLocation,
+                            SourceLocation = _rockSpriteLocation,
                             Position = -0.55,
                         };
                     }
@@ -173,14 +164,14 @@ namespace RacerCS
                     {
                         if (_random.NextDouble() < 0.05)
                         {
-                            zoneSprite = new Sprite
+                            segmentSprite = new SegmentSprite
                             {
-                                SourceLocation = _treeLocation,
+                                SourceLocation = _cactusSpriteLocation,
                                 Position = 0.6 + (4 * _random.NextDouble()),
                             };
                             if (_random.NextDouble() < 0.5)
                             {
-                                zoneSprite.Position = -zoneSprite.Position;
+                                segmentSprite.Position = -segmentSprite.Position;
                             }
                         }
                     }
@@ -189,7 +180,7 @@ namespace RacerCS
                     {
                         Height = currentHeight + finalHeight / 2 * (1 + Math.Sin(i / _roadParams.ZoneSize * Math.PI - Math.PI / 2)),
                         Curve = currentCurve + finalCurve / 2 * (1 + Math.Sin(i / _roadParams.ZoneSize * Math.PI - Math.PI / 2)),
-                        ZoneSprite = zoneSprite,
+                        SegmentSprite = segmentSprite,
                     });
                 }
 
@@ -255,7 +246,7 @@ namespace RacerCS
                 {
                     _player.PositionX -= _player.Turning;
                 }
-                _player.Sprite = _spriteLeft;
+                _player.SpriteSource = _carLeftSpriteLocation;
             }
             else if (_keys[Keys.D] || _keys[Keys.Right])
             {
@@ -263,11 +254,11 @@ namespace RacerCS
                 {
                     _player.PositionX += _player.Turning;
                 }
-                _player.Sprite = _spriteRight;
+                _player.SpriteSource = _carRightSpriteLocation;
             }
             else
             {
-                _player.Sprite = _spriteForward;
+                _player.SpriteSource = _carForwardSpriteLocation;
             }
         }
 
@@ -278,7 +269,7 @@ namespace RacerCS
             _absoluteIndex = Math.Floor(_player.Position / _roadParams.RoadSegmentSize);
 
             var currentSegmentIndex = (int)((_absoluteIndex - 2) % _roadParams.Length);
-            var currentSegmentPosition = (_absoluteIndex - 2) % _roadParams.RoadSegmentSize - _player.Position;
+            var currentSegmentPosition = (_absoluteIndex - 2) * _roadParams.RoadSegmentSize - _player.Position;
             var currentSegment = _road[currentSegmentIndex];
 
             var lastProjectedHeight = double.MaxValue;
@@ -323,15 +314,15 @@ namespace RacerCS
                         currentSegmentIndex == 2 || currentSegmentIndex == (_roadParams.Length - Game.DepthOfField));
                 }
 
-                if (currentSegment.ZoneSprite != null)
+                if (currentSegment.SegmentSprite != null)
                 {
                     spriteBuffer.Add(new SpriteBufferEntry
                     {
                         Y = (int)(Game.Height / 2 + startProjectedHeight),
-                        X = (int)(Game.Width / 2 - currentSegment.ZoneSprite.Position * Game.Width * currentScaling + currentSegment.Curve - baseOffset - (_player.PositionX - baseOffset * 2) * currentScaling),
+                        X = (int)(Game.Width / 2 - currentSegment.SegmentSprite.Position * Game.Width * currentScaling + currentSegment.Curve - baseOffset - (_player.PositionX - baseOffset * 2) * currentScaling),
                         YMax = (int)(Game.Height / 2 + lastProjectedHeight),
                         Scale = 2.5 * currentScaling,
-                        SourceLocation = currentSegment.ZoneSprite.SourceLocation,
+                        SourceLocation = currentSegment.SegmentSprite.SourceLocation,
                     });
                 }
 
@@ -425,8 +416,8 @@ namespace RacerCS
 
         private void DrawCar(Graphics g)
         {
-            var dest = new Rectangle(_player.Sprite.X, _player.Sprite.Y, _player.Sprite.Location.Width, _player.Sprite.Location.Height);
-            DrawImage(g, _player.Sprite.Location, dest, 1);
+            var dest = new Rectangle(_player.SpriteDestination.X, _player.SpriteDestination.Y, _player.SpriteSource.Width, _player.SpriteSource.Height);
+            DrawImage(g, _player.SpriteSource, dest, 1);
         }
 
         private void DrawHud(Graphics g)

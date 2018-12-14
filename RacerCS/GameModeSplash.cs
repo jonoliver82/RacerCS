@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace RacerCS
@@ -24,7 +19,7 @@ namespace RacerCS
             DrawImage(g, _logoSource, dest, 1);
 
             DrawString(g, "Instructions:", 100, 90);
-            DrawString(g, "Space to start, arrows to drive:", 30, 100);
+            DrawString(g, "Space to start, arrows to drive", 30, 100);
             DrawString(g, "Credits:", 120, 120);
             DrawString(g, "Code, Art: Selim Arsever", 55, 130);
             DrawString(g, "Font: spicypixel.net", 70, 140);

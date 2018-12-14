@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace RacerCS
 {
@@ -24,6 +20,8 @@ namespace RacerCS
 
         public double MaxSpeed { get; set; }
 
-        public CarSprite Sprite { get; set; }
+        public Rectangle SpriteSource { get; set; }
+
+        public Point SpriteDestination { get; set; }
     }
 }
