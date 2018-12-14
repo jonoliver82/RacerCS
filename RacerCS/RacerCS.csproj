@@ -48,6 +48,12 @@
   <ItemGroup>
     <Compile Include="CarSprite.cs" />
     <Compile Include="CurveState.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GameMode.cs" />
+    <Compile Include="GameModeBase.cs" />
+    <Compile Include="GameModeComplete.cs" />
+    <Compile Include="GameModeRacer.cs" />
+    <Compile Include="GameModeSplash.cs" />
     <Compile Include="HeightState.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RacerForm.cs">
@@ -62,7 +68,6 @@
     <Compile Include="RoadParameters.cs" />
     <Compile Include="RoadSegment.cs" />
     <Compile Include="Sprite.cs" />
-    <Compile Include="SpritesheetLocation.cs" />
     <Compile Include="SpriteType.cs" />
     <EmbeddedResource Include="RacerForm.resx">
       <DependentUpon>RacerForm.cs</DependentUpon>

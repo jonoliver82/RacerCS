@@ -34,8 +34,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(304, 201);
+            this.ClientSize = new System.Drawing.Size(325, 220);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "RacerForm";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Racer C#";
             this.Load += new System.EventHandler(this.RacerForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RacerForm_KeyDown);
