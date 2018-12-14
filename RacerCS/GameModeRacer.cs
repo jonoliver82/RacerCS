@@ -178,8 +178,8 @@ namespace RacerCS
 
                     _road.Add(new RoadSegment
                     {
-                        Height = currentHeight + finalHeight / 2 * (1 + Math.Sin(i / _roadParams.ZoneSize * Math.PI - Math.PI / 2)),
-                        Curve = currentCurve + finalCurve / 2 * (1 + Math.Sin(i / _roadParams.ZoneSize * Math.PI - Math.PI / 2)),
+                        Height = currentHeight + finalHeight / 2 * (1 + Math.Sin((i / _roadParams.ZoneSize) * (Math.PI - Math.PI / 2))),
+                        Curve = currentCurve + finalCurve / 2 * (1 + Math.Sin((i / _roadParams.ZoneSize) * (Math.PI - Math.PI / 2))),
                         SegmentSprite = segmentSprite,
                     });
                 }
@@ -269,7 +269,7 @@ namespace RacerCS
             _absoluteIndex = Math.Floor(_player.Position / _roadParams.RoadSegmentSize);
 
             var currentSegmentIndex = (int)((_absoluteIndex - 2) % _roadParams.Length);
-            var currentSegmentPosition = (_absoluteIndex - 2) * _roadParams.RoadSegmentSize - _player.Position;
+            var currentSegmentPosition = ((_absoluteIndex - 2) * _roadParams.RoadSegmentSize) - _player.Position;
             var currentSegment = _road[currentSegmentIndex];
 
             var lastProjectedHeight = double.MaxValue;
@@ -283,7 +283,7 @@ namespace RacerCS
 
             var baseOffset = currentSegment.Curve + (_road[(currentSegmentIndex + 1) % _roadParams.Length].Curve - currentSegment.Curve) * playerPosRelative;
 
-            _lastDelta = _player.PositionX - baseOffset * 2;
+            _lastDelta = _player.PositionX - (baseOffset * 2);
 
             var iter = Game.DepthOfField;
             while (iter-- > 0)
@@ -319,7 +319,7 @@ namespace RacerCS
                     spriteBuffer.Add(new SpriteBufferEntry
                     {
                         Y = (int)(Game.Height / 2 + startProjectedHeight),
-                        X = (int)(Game.Width / 2 - currentSegment.SegmentSprite.Position * Game.Width * currentScaling + currentSegment.Curve - baseOffset - (_player.PositionX - baseOffset * 2) * currentScaling),
+                        X = (int)(Game.Width / 2 - currentSegment.SegmentSprite.Position * Game.Width * currentScaling + currentSegment.Curve - baseOffset - (_player.PositionX - (baseOffset * 2)) * currentScaling),
                         YMax = (int)(Game.Height / 2 + lastProjectedHeight),
                         Scale = 2.5 * currentScaling,
                         SourceLocation = currentSegment.SegmentSprite.SourceLocation,
