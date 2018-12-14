@@ -14,8 +14,11 @@ namespace RacerCS
         private Image _spriteSheet;
         private Rectangle _backgroundLocation;
 
-        protected GameModeBase(string spriteSheetFile)
+        private Game _game;
+
+        protected GameModeBase(Game game, string spriteSheetFile)
         {
+            _game = game;
             _keys = new Dictionary<Keys, bool>
             {
                 { Keys.W, false },
@@ -33,7 +36,9 @@ namespace RacerCS
             _backgroundLocation = new Rectangle(0, 9, 320, 120);
         }
 
-        public abstract void Render(Game game, Graphics g);
+        public abstract void Render(Graphics g);
+
+        public Game Game => _game;
 
         public void KeyDown(KeyEventArgs e)
         {
@@ -55,9 +60,9 @@ namespace RacerCS
             g.Clear(ColorTranslator.FromHtml(htmlColor));
         }
 
-        protected void DrawImage(Graphics g, Rectangle sourceImage, double destinationX, double destinationY, int scale)
+        protected void DrawImage(Graphics g, Rectangle source, Rectangle destination, int scale)
         {
-            g.DrawImage(_spriteSheet, (float)destinationX, (float)destinationY, sourceImage, GraphicsUnit.Pixel);
+            g.DrawImage(_spriteSheet, destination, source, GraphicsUnit.Pixel);
         }
 
         protected void DrawString(Graphics g, string value, int x, int y)
@@ -75,10 +80,16 @@ namespace RacerCS
 
         protected void DrawBackground(Graphics g, double playerPosition)
         {
-            var first = playerPosition / 2 % (_backgroundLocation.Width);
-            DrawImage(g, _backgroundLocation, first - _backgroundLocation.Width + 1, 0, 1);
-            DrawImage(g, _backgroundLocation, first + _backgroundLocation.Width - 1, 0, 1);
-            DrawImage(g, _backgroundLocation, first, 0, 1);
+            var first = (int)(playerPosition / 2 % (_backgroundLocation.Width));
+
+            var dest1 = new Rectangle(first - _backgroundLocation.Width + 1, 0, _backgroundLocation.Width, _backgroundLocation.Height);
+            DrawImage(g, _backgroundLocation, dest1, 1);
+
+            var dest2 = new Rectangle(first + _backgroundLocation.Width - 1, 0, _backgroundLocation.Width, _backgroundLocation.Height);
+            DrawImage(g, _backgroundLocation, dest2, 1);
+
+            var dest3 = new Rectangle(first, 0, _backgroundLocation.Width, _backgroundLocation.Height);
+            DrawImage(g, _backgroundLocation, dest3, 1);
         }
     }
 }

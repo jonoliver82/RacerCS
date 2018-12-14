@@ -12,14 +12,16 @@ namespace RacerCS
     {
         private Rectangle _logoSource = new Rectangle(357, 9, 115, 20);
 
-        public GameModeSplash() : base("spritesheet.high.png")
+        public GameModeSplash(Game game) : base(game, "spritesheet.high.png")
         {
         }
 
-        public override void Render(Game game, Graphics g)
+        public override void Render(Graphics g)
         {
             ClearScreen(g, "#000");
-            DrawImage(g, _logoSource, 100, 20, 1);
+
+            var dest = new Rectangle(100, 20, _logoSource.Width, _logoSource.Height);
+            DrawImage(g, _logoSource, dest, 1);
 
             DrawString(g, "Instructions:", 100, 90);
             DrawString(g, "Space to start, arrows to drive:", 30, 100);
@@ -30,7 +32,7 @@ namespace RacerCS
 
             if(_keys[Keys.Space])
             {                
-                game.SetGameMode(GameMode.Race);
+                Game.SetGameMode(GameMode.Race);
             }
         }
     }

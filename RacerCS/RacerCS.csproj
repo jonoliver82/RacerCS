@@ -68,7 +68,7 @@
     <Compile Include="RoadParameters.cs" />
     <Compile Include="RoadSegment.cs" />
     <Compile Include="Sprite.cs" />
-    <Compile Include="SpriteType.cs" />
+    <Compile Include="SpriteBufferEntry.cs" />
     <EmbeddedResource Include="RacerForm.resx">
       <DependentUpon>RacerForm.cs</DependentUpon>
     </EmbeddedResource>

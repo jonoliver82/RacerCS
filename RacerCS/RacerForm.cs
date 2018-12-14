@@ -18,12 +18,12 @@ namespace RacerCS
         {
             InitializeComponent();
             _game = new Game();
-
             ClientSize = new Size(_game.Width, _game.Height);
         }
 
         private void RacerForm_Load(object sender, EventArgs e)
         {
+            _game.SetGameMode(GameMode.Splash);
             DoubleBuffered = true;
             Application.Idle += Application_Idle;
         }

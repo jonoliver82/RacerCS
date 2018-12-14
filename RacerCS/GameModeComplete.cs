@@ -10,11 +10,11 @@ namespace RacerCS
 {
     public class GameModeComplete : GameModeBase
     {
-        public GameModeComplete() : base("spritesheet.high.png")
+        public GameModeComplete(Game game) : base(game, "spritesheet.high.png")
         {
         }
 
-        public override void Render(Game game, Graphics g)
+        public override void Render(Graphics g)
         {
             ClearScreen(g, "#dc9");
             DrawBackground(g, 0);
@@ -23,7 +23,7 @@ namespace RacerCS
 
             if (_keys[Keys.Space])
             {
-                game.SetGameMode(GameMode.Race);
+                Game.SetGameMode(GameMode.Race);
             }
         }
     }
