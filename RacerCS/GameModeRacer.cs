@@ -75,11 +75,11 @@ namespace RacerCS
         {
             _roadParams = new RoadParameters
             {
-                MaxHeight = 250, // 900,
+                MaxHeight = 900,
                 MaxCurve = 100, //400,
                 Length = 12,
                 NumberOfZones = 12,
-                Curvy = 0.8,
+                Curvy = 0.0, // 0.8, Remove curves for now
                 Mountiany = 0.8,
                 NumberOfSegmentsPerZone = 250,
                 RoadSegmentSize = 5,
@@ -150,8 +150,8 @@ namespace RacerCS
                 {
                     var segment = new RoadSegment
                     {
-                        Height = zone.HeightStep * i,
-                        Curve = zone.CurveStep * i,
+                        Height = zone.StartHeight + (zone.HeightStep * i),
+                        Curve = zone.StartCurve + (zone.CurveStep * i),
                         SegmentSprite = SelectSegmentSprite(i)
                     };
 
@@ -168,8 +168,6 @@ namespace RacerCS
 
                 _roadZones.Add(zone);
             }
-
-            
         }
 
         private CurveState SelectNextZoneCurveTransition()
@@ -193,11 +191,7 @@ namespace RacerCS
 
         private HeightState SelectNextZoneHeightTransition()
         {
-            if (_random.NextDouble() > _roadParams.Curvy)
-            {
-                return HeightState.Flat;
-            }
-            else
+            if (_random.NextDouble() < _roadParams.Mountiany)
             {
                 if (_random.NextDouble() > 0.5)
                 {
@@ -207,6 +201,10 @@ namespace RacerCS
                 {
                     return HeightState.Down;
                 }
+            }
+            else
+            {
+                return HeightState.Flat;
             }
         }
 
@@ -303,7 +301,6 @@ namespace RacerCS
         private void RenderRoad(Graphics g)
         {
             var spriteBuffer = new List<SpriteBufferEntry>();
-
             _absoluteIndex = Math.Floor(_player.Position / _roadParams.RoadSegmentSize);
 
             var currentSegmentIndex = (int)((_absoluteIndex - 2) % _roadParams.Length);
@@ -342,10 +339,10 @@ namespace RacerCS
                 if (currentHeight > endProjectedHeight)
                 {
                     DrawSegment(g,
-                        Game.Height / 2 + currentHeight,
+                        (Game.Height / 2) + currentHeight,
                         currentScaling, 
                         currentSegment.Curve - baseOffset - _lastDelta * currentScaling,
-                        Game.Height / 2 + endProjectedHeight,
+                        (Game.Height / 2) + endProjectedHeight,
                         endScaling,
                         nextSegment.Curve - baseOffset - _lastDelta * endScaling,
                         counter < _roadParams.NumberOfSegmentsPerColor, 
@@ -480,8 +477,10 @@ namespace RacerCS
 
             var zoneIndex = (int)(Math.Floor(_absoluteIndex / _roadParams.NumberOfSegmentsPerZone));
             DrawString(g, $"ZONE {zoneIndex}", 267, 20);
+            var zone = _roadZones[zoneIndex];
 
-            DrawString(g, $"{_roadZones[zoneIndex].CurveTransition} {_roadZones[zoneIndex].HeightTransition}", 1, 230);
+            DrawString(g, $"{zone.CurveTransition} {zone.HeightTransition}", 1, 230);
+            DrawString(g, $"{zone.StartHeight} ${zone.EndHeight}", 1, 220);
         }
     }
 }
