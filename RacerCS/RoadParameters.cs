@@ -12,10 +12,14 @@
 
         public double Mountiany { get; set; }
 
-        public int ZoneSize { get; set; }
+        public int NumberOfSegmentsPerZone { get; set; }
+
+        public int NumberOfZones { get; set; }
 
         public int RoadSegmentSize { get; set; }
 
         public int NumberOfSegmentsPerColor { get; set; }
+
+        public double OffRoadOffset { get; set; }
     }
 }

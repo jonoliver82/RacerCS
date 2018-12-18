@@ -17,6 +17,7 @@ namespace RacerCS
         private double _lastDelta;
 
         private List<RoadSegment> _road;
+        private List<RoadZone> _roadZones;
 
         private Rectangle _cactusSpriteLocation;
         private Rectangle _rockSpriteLocation;
@@ -55,12 +56,14 @@ namespace RacerCS
             {
                 Position = 10,
                 Speed = 0,
-                Acceleration = 0.025,
-                Deceleration = 0.3,
+                Acceleration = 0.002,
+                Deceleration = 0.002,
+                DecelerationOffRoad = 0.2,
                 Breaking = 0.6,
-                Turning = 5.0,
+                Turning = 0.5,
                 PositionX = 0,
                 MaxSpeed = 5,
+                MaxSpeedOffRoad = 3,
                 SpriteSource = _carForwardSpriteLocation,
                 SpriteDestination = new Point(125, 190)
             };
@@ -72,40 +75,33 @@ namespace RacerCS
         {
             _roadParams = new RoadParameters
             {
-                MaxHeight = 900,
-                MaxCurve = 400,
+                MaxHeight = 250, // 900,
+                MaxCurve = 100, //400,
                 Length = 12,
+                NumberOfZones = 12,
                 Curvy = 0.8,
                 Mountiany = 0.8,
-                ZoneSize = 250,
+                NumberOfSegmentsPerZone = 250,
                 RoadSegmentSize = 5,
                 NumberOfSegmentsPerColor = 4,
+                OffRoadOffset = 130,
             };
+            _roadParams.Length = _roadParams.NumberOfZones * _roadParams.NumberOfSegmentsPerZone;
 
             _road = new List<RoadSegment>();
+            _roadZones = new List<RoadZone>();
 
             HeightState currentStateHeight = HeightState.Flat;
-            HeightState[,] transitionHeights = new HeightState[,]
-            {
-                { HeightState.Flat, HeightState.Up, HeightState.Down },
-                { HeightState.Flat, HeightState.Down, HeightState.Down },
-                { HeightState.Flat, HeightState.Up, HeightState.Up },
-            };
-
             CurveState currentStateCurve = CurveState.Straight;
-            CurveState[,] transitionCurves = new CurveState[,]
-            {
-                { CurveState.Straight, CurveState.Left, CurveState.Right },
-                { CurveState.Straight, CurveState.Right, CurveState.Right },
-                { CurveState.Straight, CurveState.Left, CurveState.Left },
-            };
 
             var currentHeight = 0.0;
             var currentCurve = 0.0;
-            var zones = _roadParams.Length;
+            var zones = _roadParams.NumberOfZones;
 
             while (zones-- > 0)
             {
+                var zone = new RoadZone(_roadParams.NumberOfSegmentsPerZone);
+
                 // Generate current zone
                 var finalHeight = 0.0;
                 switch (currentStateHeight)
@@ -147,75 +143,117 @@ namespace RacerCS
                         }
                 }
 
-                for (int i = 0; i < _roadParams.ZoneSize; i++)
+                zone.AddCurve(currentStateCurve, currentCurve, finalCurve);
+                zone.AddHeight(currentStateHeight, currentHeight, finalHeight);
+
+                for (int i = 0; i < _roadParams.NumberOfSegmentsPerZone; i++)
                 {
-                    SegmentSprite segmentSprite = null;
+                    var segment = new RoadSegment
+                    {
+                        Height = zone.HeightStep * i,
+                        Curve = zone.CurveStep * i,
+                        SegmentSprite = SelectSegmentSprite(i)
+                    };
 
-                    // Add a tree
-                    if (i % _roadParams.ZoneSize / 4 == 0)
-                    {
-                        segmentSprite = new SegmentSprite
-                        {
-                            SourceLocation = _rockSpriteLocation,
-                            Position = -0.55,
-                        };
-                    }
-                    else
-                    {
-                        if (_random.NextDouble() < 0.05)
-                        {
-                            segmentSprite = new SegmentSprite
-                            {
-                                SourceLocation = _cactusSpriteLocation,
-                                Position = 0.6 + (4 * _random.NextDouble()),
-                            };
-                            if (_random.NextDouble() < 0.5)
-                            {
-                                segmentSprite.Position = -segmentSprite.Position;
-                            }
-                        }
-                    }
-
-                    _road.Add(new RoadSegment
-                    {
-                        Height = currentHeight + finalHeight / 2 * (1 + Math.Sin((i / _roadParams.ZoneSize) * (Math.PI - Math.PI / 2))),
-                        Curve = currentCurve + finalCurve / 2 * (1 + Math.Sin((i / _roadParams.ZoneSize) * (Math.PI - Math.PI / 2))),
-                        SegmentSprite = segmentSprite,
-                    });
+                    _road.Add(segment);
+                    zone.AddSegment(segment);
                 }
 
-                currentHeight += finalHeight;
-                currentCurve += finalCurve;
+                // was +=
+                currentHeight = finalHeight;
+                currentCurve = finalCurve;
 
-                // Find next zone
-                if (_random.NextDouble() < _roadParams.Mountiany)
+                currentStateHeight = SelectNextZoneHeightTransition();
+                currentStateCurve = SelectNextZoneCurveTransition();
+
+                _roadZones.Add(zone);
+            }
+
+            
+        }
+
+        private CurveState SelectNextZoneCurveTransition()
+        {
+            if (_random.NextDouble() > _roadParams.Curvy)
+            {
+                return CurveState.Straight;
+            }
+            else
+            {
+                if (_random.NextDouble() > 0.5)
                 {
-                    currentStateHeight = transitionHeights[(int)currentStateHeight, (int)(1 + Math.Round(_random.NextDouble()))];
+                    return CurveState.Left;
                 }
                 else
                 {
-                    currentStateHeight = transitionHeights[(int)currentStateHeight, 0];
-                }
-
-                if (_random.NextDouble() < _roadParams.Curvy)
-                {
-                    currentStateCurve = transitionCurves[(int)currentStateCurve, (int)(1 + Math.Round(_random.NextDouble()))];
-                }
-                else
-                {
-                    currentStateCurve = transitionCurves[(int)currentStateCurve, 0];
+                    return CurveState.Right;
                 }
             }
-            _roadParams.Length = _roadParams.Length * _roadParams.ZoneSize;
+        }
+
+        private HeightState SelectNextZoneHeightTransition()
+        {
+            if (_random.NextDouble() > _roadParams.Curvy)
+            {
+                return HeightState.Flat;
+            }
+            else
+            {
+                if (_random.NextDouble() > 0.5)
+                {
+                    return HeightState.Up;
+                }
+                else
+                {
+                    return HeightState.Down;
+                }
+            }
+        }
+
+        private SegmentSprite SelectSegmentSprite(int segmentPosition)
+        {
+            SegmentSprite segmentSprite = null;
+
+            // Add a rock or cactus
+            if (segmentPosition % _roadParams.NumberOfSegmentsPerZone / 4 == 0)
+            {
+                segmentSprite = new SegmentSprite
+                {
+                    SourceLocation = _rockSpriteLocation,
+                    Position = -0.55,
+                };
+            }
+            else
+            {
+                if (_random.NextDouble() < 0.05)
+                {
+                    segmentSprite = new SegmentSprite
+                    {
+                        SourceLocation = _cactusSpriteLocation,
+                        Position = 0.6 + (4 * _random.NextDouble()),
+                    };
+                }
+            }
+
+            if (segmentSprite != null)
+            {
+                if (_random.NextDouble() < 0.5)
+                {
+                    segmentSprite.Position = -segmentSprite.Position;
+                }
+            }
+
+            return segmentSprite;
         }
 
         private void UpdateCarState()
         {
-            if (Math.Abs(_lastDelta) > 130)
+            // If player position is off road then reduce player speed
+            if (Math.Abs(_lastDelta) > _roadParams.OffRoadOffset)
             {
-                if (_player.Speed > 3)
+                if (_player.Speed > _player.MaxSpeedOffRoad)
                 {
-                    _player.Speed -= 0.2;
+                    _player.Speed -= _player.DecelerationOffRoad;
                 }
             }
             else
@@ -431,6 +469,19 @@ namespace RacerCS
 
             var speed = Math.Round(_player.Speed / _player.MaxSpeed * 200);
             DrawString(g, $"{speed}mph", 1, 10);
+
+            var offRoad = Math.Abs(_lastDelta) > _roadParams.OffRoadOffset;
+            if (offRoad)
+            {
+                DrawString(g, "OFF", 1, 20);
+            }
+
+            DrawString(g, $"{_absoluteIndex}", 267, 10);
+
+            var zoneIndex = (int)(Math.Floor(_absoluteIndex / _roadParams.NumberOfSegmentsPerZone));
+            DrawString(g, $"ZONE {zoneIndex}", 267, 20);
+
+            DrawString(g, $"{_roadZones[zoneIndex].CurveTransition} {_roadZones[zoneIndex].HeightTransition}", 1, 230);
         }
     }
 }

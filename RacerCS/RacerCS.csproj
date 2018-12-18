@@ -66,6 +66,7 @@
     <Compile Include="RenderInformation.cs" />
     <Compile Include="RoadParameters.cs" />
     <Compile Include="RoadSegment.cs" />
+    <Compile Include="RoadZone.cs" />
     <Compile Include="SegmentSprite.cs" />
     <Compile Include="SpriteBufferEntry.cs" />
     <EmbeddedResource Include="RacerForm.resx">

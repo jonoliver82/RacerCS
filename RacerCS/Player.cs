@@ -20,6 +20,10 @@ namespace RacerCS
 
         public double MaxSpeed { get; set; }
 
+        public double MaxSpeedOffRoad { get; set; }
+
+        public double DecelerationOffRoad { get; set; }
+
         public Rectangle SpriteSource { get; set; }
 
         public Point SpriteDestination { get; set; }
