@@ -35,7 +35,7 @@ namespace RacerCS
 
         public override void Render(Graphics g)
         {
-            ClearScreen(g, "#dc9");
+            ClearScreen(g, GameColors.SAND);
             UpdateCarState();
             DrawBackground(g, -_player.PositionX);
             RenderRoad(g);
@@ -56,9 +56,9 @@ namespace RacerCS
             {
                 Position = 10,
                 Speed = 0,
-                Acceleration = 0.002,
-                Deceleration = 0.002,
-                DecelerationOffRoad = 0.2,
+                Acceleration = 0.01,
+                Deceleration = 0.01,
+                DecelerationOffRoad = 0.5,
                 Breaking = 0.6,
                 Turning = 0.5,
                 PositionX = 0,
@@ -76,10 +76,10 @@ namespace RacerCS
             _roadParams = new RoadParameters
             {
                 MaxHeight = 900,
-                MaxCurve = 100, //400,
+                MaxCurve = 400,
                 Length = 12,
                 NumberOfZones = 12,
-                Curvy = 0.0, // 0.8, Remove curves for now
+                Curvy = 0.8,
                 Mountiany = 0.8,
                 NumberOfSegmentsPerZone = 250,
                 RoadSegmentSize = 5,
@@ -159,7 +159,6 @@ namespace RacerCS
                     zone.AddSegment(segment);
                 }
 
-                // was +=
                 currentHeight = finalHeight;
                 currentCurve = finalCurve;
 
@@ -244,31 +243,34 @@ namespace RacerCS
             return segmentSprite;
         }
 
+        private bool IsOffRoad()
+        {
+            return Math.Abs(_lastDelta) > _roadParams.OffRoadOffset;
+        }
+
         private void UpdateCarState()
         {
             // If player position is off road then reduce player speed
-            if (Math.Abs(_lastDelta) > _roadParams.OffRoadOffset)
+            if (IsOffRoad())
             {
                 if (_player.Speed > _player.MaxSpeedOffRoad)
                 {
                     _player.Speed -= _player.DecelerationOffRoad;
                 }
             }
+
+            // Check keys
+            if (_keys[Keys.W] || _keys[Keys.Up])
+            {
+                _player.Speed += _player.Acceleration;
+            }
+            else if (_keys[Keys.S] || _keys[Keys.Down])
+            {
+                _player.Speed -= _player.Breaking;
+            }
             else
             {
-                // Read acceleration controls
-                if (_keys[Keys.W] || _keys[Keys.Up])
-                {
-                    _player.Speed += _player.Acceleration;
-                }
-                else if (_keys[Keys.S] || _keys[Keys.Down])
-                {
-                    _player.Speed -= _player.Breaking;
-                }
-                else
-                {
-                    _player.Speed -= _player.Deceleration;
-                }
+                _player.Speed -= IsOffRoad() ? _player.DecelerationOffRoad : _player.Deceleration;
             }
 
             _player.Speed = Math.Max(_player.Speed, 0);
@@ -377,21 +379,21 @@ namespace RacerCS
 
         private void DrawSegment(Graphics g, double position1, double scale1, double offset1, double position2, double scale2, double offset2, bool alternate, bool finishStart)
         {
-            var grass = alternate ? "#eda" : "#dc9";
-            var border = alternate ? "#e00" : "#fff";
-            var road = alternate ? "#999" : "#777";
-            var lane = alternate ? "#fff" : "#777";
+            var sand = alternate ? GameColors.SAND_ALT : GameColors.SAND;
+            var border = alternate ? GameColors.BORDER_RED : GameColors.WHITE;
+            var road = alternate ? GameColors.LIGHT_GRAY : GameColors.GRAY;
+            var lane = alternate ? GameColors.WHITE : GameColors.GRAY;
 
             if (finishStart)
             {
-                road = "#fff";
-                lane = "#fff";
-                border = "#fff";
+                road = GameColors.WHITE;
+                lane = GameColors.WHITE;
+                border = GameColors.WHITE;
             }
 
-            // Draw Grass
-            var grassBrush = new SolidBrush(ColorTranslator.FromHtml(grass));
-            g.FillRectangle(grassBrush, new Rectangle(0, (int)position2, Game.Width, (int)(position1 - position2)));
+            // Draw Sand
+            var sandBrush = new SolidBrush(ColorTranslator.FromHtml(sand));
+            g.FillRectangle(sandBrush, new Rectangle(0, (int)position2, Game.Width, (int)(position1 - position2)));
 
             // Draw the road
             DrawTrapezoid(g, position1, scale1, offset1, position2, scale2, offset2, -0.5, 0.5, road);
@@ -460,27 +462,20 @@ namespace RacerCS
             var percent = (int)(Math.Round(_absoluteIndex / (_roadParams.Length - Game.DepthOfField) * 100));
             DrawString(g, $"{percent}%", 287, 1);
 
-            var diff = DateTime.Now - _raceStartTime;
-            var currentTimeString = diff.ToString(@"mm\:ss\:ff");
+            Game.RaceTimeSpan = DateTime.Now - _raceStartTime;
+            var currentTimeString = Game.RaceTimeSpan.ToString(@"mm\:ss\:ff");
             DrawString(g, currentTimeString, 1, 1);
 
             var speed = Math.Round(_player.Speed / _player.MaxSpeed * 200);
             DrawString(g, $"{speed}mph", 1, 10);
 
-            var offRoad = Math.Abs(_lastDelta) > _roadParams.OffRoadOffset;
-            if (offRoad)
+            if (IsOffRoad())
             {
                 DrawString(g, "OFF", 1, 20);
             }
 
-            DrawString(g, $"{_absoluteIndex}", 267, 10);
-
-            var zoneIndex = (int)(Math.Floor(_absoluteIndex / _roadParams.NumberOfSegmentsPerZone));
-            DrawString(g, $"ZONE {zoneIndex}", 267, 20);
-            var zone = _roadZones[zoneIndex];
-
-            DrawString(g, $"{zone.CurveTransition} {zone.HeightTransition}", 1, 230);
-            DrawString(g, $"{zone.StartHeight} ${zone.EndHeight}", 1, 220);
+            var zoneIndex = (int)(Math.Floor((_absoluteIndex / _roadParams.NumberOfSegmentsPerZone) + 1));
+            DrawString(g, $"ZONE {zoneIndex}", 262, 10);
         }
     }
 }

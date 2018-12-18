@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace RacerCS
@@ -60,5 +61,7 @@ namespace RacerCS
         public int CameraHeight => _renderInfo.CameraHeight;
 
         public int CameraDistance => _renderInfo.CameraDistance;
+
+        public TimeSpan RaceTimeSpan { get; set; }
     }
 }
