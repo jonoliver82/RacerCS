@@ -13,6 +13,8 @@ namespace RacerCS
         public const string BORDER_RED = "#e00";
         public const string WHITE = "#fff";
         public const string LIGHT_GRAY = "#999";
-        public const string GRAY = "#777";        
+        public const string GRAY = "#777";
+        public const string GRASS = "#006a4e";
+        public const string GRASS_ALT = "#00b786";       
     }
 }

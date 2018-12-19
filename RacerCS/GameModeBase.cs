@@ -56,7 +56,7 @@ namespace RacerCS
             g.Clear(ColorTranslator.FromHtml(htmlColor));
         }
 
-        protected void DrawImage(Graphics g, Rectangle source, Rectangle destination, int scale)
+        protected void DrawImage(Graphics g, Rectangle source, Rectangle destination)
         {
             g.DrawImage(_spriteSheet, destination, source, GraphicsUnit.Pixel);
         }
@@ -78,14 +78,14 @@ namespace RacerCS
         {
             var first = (int)(playerPosition / 2 % (_backgroundLocation.Width));
 
-            var dest1 = new Rectangle(first - _backgroundLocation.Width + 1, 0, _backgroundLocation.Width, _backgroundLocation.Height);
-            DrawImage(g, _backgroundLocation, dest1, 1);
+            var dest1 = new Rectangle(first - _backgroundLocation.Width + 1, 0, _backgroundLocation.Width, Game.Height / 2);
+            DrawImage(g, _backgroundLocation, dest1);
 
-            var dest2 = new Rectangle(first + _backgroundLocation.Width - 1, 0, _backgroundLocation.Width, _backgroundLocation.Height);
-            DrawImage(g, _backgroundLocation, dest2, 1);
+            var dest2 = new Rectangle(first + _backgroundLocation.Width - 1, 0, _backgroundLocation.Width, Game.Height / 2);
+            DrawImage(g, _backgroundLocation, dest2);
 
-            var dest3 = new Rectangle(first, 0, _backgroundLocation.Width, _backgroundLocation.Height);
-            DrawImage(g, _backgroundLocation, dest3, 1);
+            var dest3 = new Rectangle(first, 0, _backgroundLocation.Width, Game.Height / 2);
+            DrawImage(g, _backgroundLocation, dest3);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace RacerCS
 
         public override void Render(Graphics g)
         {
-            ClearScreen(g, GameColors.SAND);
+            ClearScreen(g, GameColors.GRASS);
             UpdateCarState();
             DrawBackground(g, -_player.PositionX);
             RenderRoad(g);
@@ -52,6 +52,9 @@ namespace RacerCS
             _carLeftSpriteLocation = new Rectangle(70, 130, 77, 38);
             _carRightSpriteLocation = new Rectangle(148, 130, 77, 38);
 
+            var carX = 125;
+            var carY = 190;
+
             _player = new Player
             {
                 Position = 10,
@@ -65,7 +68,7 @@ namespace RacerCS
                 MaxSpeed = 5,
                 MaxSpeedOffRoad = 3,
                 SpriteSource = _carForwardSpriteLocation,
-                SpriteDestination = new Point(125, 190)
+                SpriteDestination = new Point(carX, carY),
             };
 
             GenerateRoad();
@@ -379,7 +382,7 @@ namespace RacerCS
 
         private void DrawSegment(Graphics g, double position1, double scale1, double offset1, double position2, double scale2, double offset2, bool alternate, bool finishStart)
         {
-            var sand = alternate ? GameColors.SAND_ALT : GameColors.SAND;
+            var sand = alternate ? GameColors.GRASS_ALT : GameColors.GRASS;
             var border = alternate ? GameColors.BORDER_RED : GameColors.WHITE;
             var road = alternate ? GameColors.LIGHT_GRAY : GameColors.GRAY;
             var lane = alternate ? GameColors.WHITE : GameColors.GRAY;
@@ -439,7 +442,7 @@ namespace RacerCS
             {
                 var source = new Rectangle(sprite.SourceLocation.X, sprite.SourceLocation.Y, sprite.SourceLocation.Width, height);
                 var dest = new Rectangle(sprite.X, (int)destY, (int)(sprite.Scale * sprite.SourceLocation.Width), (int)(sprite.Scale * height));
-                DrawImage(g, source, dest, 1);
+                DrawImage(g, source, dest);
             }
         }
 
@@ -454,7 +457,7 @@ namespace RacerCS
         private void DrawCar(Graphics g)
         {
             var dest = new Rectangle(_player.SpriteDestination.X, _player.SpriteDestination.Y, _player.SpriteSource.Width, _player.SpriteSource.Height);
-            DrawImage(g, _player.SpriteSource, dest, 1);
+            DrawImage(g, _player.SpriteSource, dest);
         }
 
         private void DrawHud(Graphics g)

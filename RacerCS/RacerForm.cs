@@ -7,6 +7,8 @@ namespace RacerCS
     public partial class RacerForm : Form
     {
         private Game _game;
+        private float _scaleX = 1;
+        private float _scaleY = 1;
 
         public RacerForm()
         {
@@ -28,7 +30,8 @@ namespace RacerCS
         }
 
         protected override void OnPaint(PaintEventArgs e)
-        {
+        {            
+            e.Graphics.ScaleTransform(_scaleX, _scaleY);
             _game.Render(e.Graphics);
         }
 
@@ -40,6 +43,12 @@ namespace RacerCS
         private void RacerForm_KeyUp(object sender, KeyEventArgs e)
         {
             _game.KeyUp(e);
-        }       
+        }
+
+        private void RacerForm_Resize(object sender, EventArgs e)
+        {
+            _scaleX = (float)ClientSize.Width / (float)_game.Width;
+            _scaleY = (float)ClientSize.Height / (float)_game.Height;
+        }
     }
 }

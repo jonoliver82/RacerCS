@@ -38,11 +38,11 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "RacerForm";
-            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Racer C#";
             this.Load += new System.EventHandler(this.RacerForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RacerForm_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.RacerForm_KeyUp);
+            this.Resize += new System.EventHandler(this.RacerForm_Resize);
             this.ResumeLayout(false);
 
         }

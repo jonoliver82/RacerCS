@@ -16,7 +16,7 @@ namespace RacerCS
             ClearScreen(g, "#000");
 
             var dest = new Rectangle(100, 20, _logoSource.Width, _logoSource.Height);
-            DrawImage(g, _logoSource, dest, 1);
+            DrawImage(g, _logoSource, dest);
 
             DrawString(g, "Instructions:", 100, 90);
             DrawString(g, "Space to start, arrows to drive", 30, 100);
